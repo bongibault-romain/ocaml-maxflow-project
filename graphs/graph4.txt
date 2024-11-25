@@ -1,0 +1,15 @@
+% Graph saved at Tue Nov 14 2023 14:49:43 GMT+0100 (heure normale d’Europe centrale)
+n 130 200 0
+n 225 300 1
+n 325 300 2
+n 175 100 3
+n 275 100 4 0
+n 370 200 5 0
+e 0 1 0 15
+e 1 2 1 12
+e 2 5 2 7
+e 0 3 3 4
+e 3 4 4 10
+e 4 5 5 10
+e 2 3 6 3
+e 4 1 7 5

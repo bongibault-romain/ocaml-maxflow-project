@@ -1,0 +1,8 @@
+% Graph saved at Tue Nov 14 2023 14:52:33 GMT+0100 (heure normale d’Europe centrale)
+n 100 200 0
+n 241 300 1
+n 388.5442902770224 115.77669162194705 2
+e 0 1 0 2
+e 0 2 1 4
+e 1 2 2 3
+e 1 0 5 4
