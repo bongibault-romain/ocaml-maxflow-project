@@ -29,7 +29,7 @@ let () =
   (* Open file *)
   let graph = from_file infile in
 
-  let path = find_path graph 0 12 in
+  let path = find_path graph 0 1 in
 
   print_path path;
 
