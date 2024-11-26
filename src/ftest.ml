@@ -1,5 +1,6 @@
 open Gfile
-    
+open Tools
+
 let () =
 
   (* Check the number of command-line arguments *)
@@ -28,8 +29,11 @@ let () =
   (* Open file *)
   let graph = from_file infile in
 
+  let path = find_path graph 0 12 in
+
+  print_path path;
+
   (* Rewrite the graph that has been read. *)
-  let () = write_file outfile graph in
+  let () = export outfile graph in
 
   ()
-

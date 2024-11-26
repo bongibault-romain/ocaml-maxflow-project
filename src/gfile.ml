@@ -52,6 +52,20 @@ let write_file path graph =
   close_out ff ;
   ()
 
+let export path graph =
+  (* Open a write-file *)
+  let ff = open_out path in
+
+  (* Write in this file. *)
+  fprintf ff "digraph exported_graph {\n\tfontname=\"Helvetica,Arial,sans-serif\"\n\tnode [fontname=\"Helvetica,Arial,sans-serif\"]\n\tedge [fontname=\"Helvetica,Arial,sans-serif\"]\n\trankdir=LR;\n\tnode [shape = circle];";
+
+  (* Write all nodes *)
+  e_iter graph (fun arc -> fprintf ff "\n\t%d -> %d [label = \"%s\"]" (arc.src) (arc.tgt) (arc.lbl)) ;
+  fprintf ff "\n}" ;
+
+  close_out ff;
+  ()
+
 (* Reads a line with a node. *)
 let read_node graph line =
   try Scanf.sscanf line "n %f %f %d" (fun _ _ id -> new_node graph id)

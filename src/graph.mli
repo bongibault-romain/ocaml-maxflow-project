@@ -19,7 +19,6 @@ type 'a arc =
 
 exception Graph_error of string
 
-
 (**************  CONSTRUCTORS  **************)
 
 (* The empty graph. *)

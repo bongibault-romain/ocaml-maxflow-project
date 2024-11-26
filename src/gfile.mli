@@ -5,6 +5,9 @@ open Graph
 
 type path = string
 
+(* Writes a string graph in dot format *)
+val export: path -> string graph -> unit
+
 (* Values are read as strings. *)
 val from_file: path -> string graph
 
