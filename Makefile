@@ -1,8 +1,8 @@
 .PHONY: all build format edit demo clean
 
-src?=0
-dst?=5
-graph?=graph1.txt
+src?=-1
+dst?=-2
+graph?=graph11.txt
 
 all: build
 
@@ -21,9 +21,10 @@ demo: build
 	@echo "\n   ⚡  EXECUTING  ⚡\n"
 	./ftest.exe graphs/${graph} $(src) $(dst) outfile
 	@echo "\n   🥁  RESULT (content of outfile)  🥁\n"
-	@cat outfile
+	# @cat outfile
 
 clean:
 	find -L . -name "*~" -delete
 	rm -f *.exe
+	rm -rf ./example/*.dot ./example/*.png ./example/*.svg
 	dune clean

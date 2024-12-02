@@ -57,10 +57,33 @@ let export path graph =
   let ff = open_out path in
 
   (* Write in this file. *)
-  fprintf ff "digraph exported_graph {\n\tfontname=\"Helvetica,Arial,sans-serif\"\n\tnode [fontname=\"Helvetica,Arial,sans-serif\"]\n\tedge [fontname=\"Helvetica,Arial,sans-serif\"]\n\trankdir=LR;\n\tnode [shape = circle];";
+  fprintf ff "digraph exported_graph {\n\tfontname=\"Helvetica,Arial,sans-serif\"\n\tnode [fontname=\"Helvetica,Arial,sans-serif\"]\n\tedge [fontname=\"Helvetica,Arial,sans-serif\"]\n\trankdir = BT;\n\tsplines = false;\n\tnode [shape = circle];";
 
   (* Write all nodes *)
   e_iter graph (fun arc -> fprintf ff "\n\t%d -> %d [label = \"%s\"]" (arc.src) (arc.tgt) (arc.lbl)) ;
+  fprintf ff "\n}" ;
+
+  close_out ff;
+  ()
+
+let export_with_clusters path graph clusters =
+  (* Open a write-file *)
+  let ff = open_out path in
+
+  (* Write in this file. *)
+  fprintf ff "digraph exported_graph {\n\tfontname=\"Helvetica,Arial,sans-serif\"\n\tnode [fontname=\"Helvetica,Arial,sans-serif\"]\n\tedge [fontname=\"Helvetica,Arial,sans-serif\"];\n\trankdir = BT;\n\tsplines = false;\n\tnode [shape = circle];";
+
+  (* Write all nodes *)
+  e_iter graph (fun arc -> fprintf ff "\n\t%d -> %d [label = \"%s\"]" (arc.src) (arc.tgt) (arc.lbl)) ;
+
+  (* Write all clusters *)
+  List.iter (fun (cluster) -> 
+    fprintf ff "\n\tsubgraph {\n\t\trank = same;\n\t\tcolor = transparent;\n";
+    fprintf ff "\t\t" ;
+    List.iter (fun node -> fprintf ff "%d; " node) cluster;  
+    fprintf ff "\n\t}"
+  ) clusters ;
+
   fprintf ff "\n}" ;
 
   close_out ff;
@@ -126,3 +149,31 @@ let from_file path =
   close_in infile ;
   final_graph
   
+let read_schools line =
+  let schools = String.split_on_char ' ' line in
+  List.map int_of_string schools
+
+let read_wishes line =
+  let wishes = String.split_on_char ' ' line in
+  let id = int_of_string (List.hd wishes) in
+  let wishes = List.tl wishes in
+  id, List.map int_of_string wishes 
+
+let from_file_wishes path = 
+  let infile = open_in path in 
+
+  let line = input_line infile in
+  let schools = read_schools line in
+
+  let rec loop students =
+    try 
+      let line = input_line infile in
+      (* read the first int of the line *)
+      let student = read_wishes line in
+      loop (student::students)
+    with End_of_file -> students
+  
+  in let students = loop [] in
+
+  close_in infile;
+  students, schools
