@@ -36,7 +36,7 @@ jobs:
       - name: Use OCaml ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v3
         with:
-          ocaml-version: ${{ matrix.ocaml-version }}
+          ocaml-compiler: 5
 
       - run: opam install dune
       - name: Build project
