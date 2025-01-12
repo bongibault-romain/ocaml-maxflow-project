@@ -2,21 +2,118 @@ open Gfile
 open Tools
 open Algorithms
 
+let verbose = ref None
+let outfile = ref None
+let infile = ref None
+let ford_fulkerson_source = ref None
+let ford_fulkerson_sink = ref None
+let debug = ref false
+
+let biparti = ref false
+
+let usage = 
+  "\n✻ Usage: %s [OPTIONS]... [INFILE] -o [OUTFILE]" ^ Sys.argv.(0)
+  ^ ("\n\n🟄  INFILE   : input file containing a graph\n\n")
+  ^ ("🟄  OPTIONS:\n")
+;;
+
+let anonymous filename =
+  infile := Some filename
+
+let speclist = [
+  ("-v", Arg.String (fun s -> verbose := Some s), "[DIRECTORY]\n    Verbose mode, export all steps of the algorithm in DIRECTORY\n");
+  ("-o", Arg.String (fun s -> outfile := Some s), "[OUTFILE]\n    Output file in which the result should be written.\n");
+  ("-d", Arg.Unit (fun _ -> debug := true), "Debug mode, more information will be printed\n");
+  ("-f", Arg.Tuple [Arg.Int (fun i -> ford_fulkerson_source := Some i); Arg.Int (fun i -> ford_fulkerson_sink := Some i)],  "[SOURCE] [SINK]\n    Launch ford fulkerson algorithm, SOURCE and SINK are the source and sink nodes.\n");
+  ("-b", Arg.Unit (fun _ -> biparti := true), "Launch students-to-school assignation algorithm");
+]
+
+let validate_args () =
+  match !infile with
+    | None -> Printf.printf "Error: no input file specified\n"; exit 1
+    | Some _ -> ();
+  (* ensure not -f and -b at the same time *)
+  match (!ford_fulkerson_sink, !ford_fulkerson_source, !biparti) with
+    | (Some _, Some _, true) -> Printf.printf "Error: -f and -b cannot be used at the same time\n"; exit 1
+    | _ -> ()
+
 let () =
+    Arg.parse speclist anonymous usage;
 
-  (* Check the number of command-line arguments *)
-  if Array.length Sys.argv <> 5 then
-    begin
-      Printf.printf
-        "\n ✻  Usage: %s infile source sink outfile\n\n%s%!" Sys.argv.(0)
-        ("    🟄  infile  : input file containing a graph\n" ^
-         "    🟄  source  : identifier of the source vertex (used by the ford-fulkerson algorithm)\n" ^
-         "    🟄  sink    : identifier of the sink vertex (ditto)\n" ^
-         "    🟄  outfile : output file in which the result should be written.\n\n") ;
-      exit 0
-    end ;
+    validate_args ();
+
+    match (!ford_fulkerson_sink, !ford_fulkerson_source) with
+    | (Some sink, Some source) -> 
+        print_if !debug ("Reading input file (" ^ (Option.get (!infile)) ^ ")...\n");
+    
+        let sgraph = from_file (Option.get !infile) in
+        let graph = gmap sgraph int_of_string in
+
+        print_if !debug ("Running Ford Fulkerson algorithm...");
+        let flow, end_graph = ford_fulkerson graph source sink (fun current_graph i -> (
+          print_if !debug ("\nRunning Ford Fulkerson algorithm (step " ^ (string_of_int i) ^ ")...");
+
+          if (Option.is_some !verbose) then begin
+            print_if !debug ("✻ Intermediate graph exported at step " ^ (Option.get !verbose) ^ "/" ^  string_of_int i ^ ".dot\n");
+            let end_graph = convert_to_flow_graph graph current_graph in
+            export ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".dot") end_graph;
+          end;
+
+        )) in
+        let end_graph = convert_to_flow_graph graph end_graph in
+
+        (* Beautiful print result *)
+        Printf.printf "\n✻ Max flow: %d\n" flow;
+
+        if (Option.is_some !outfile) then begin
+          Printf.printf "✻ Graph exported at %s\n" (Option.get !outfile);
+          export (Option.get !outfile) end_graph;
+        end;
+
+        Printf.printf "\n";
+
+      | _ -> ();
+
+    if !biparti then begin
+      print_if !debug ("Running students-to-school assignation algorithm...");
+      print_if !debug ("Reading wishes file (" ^ (Option.get (!infile)) ^ ")...\n");
+      let students, schools = from_file_wishes (Option.get !infile) in
+
+      print_if !debug ("Creating biparti graph...\n");
+
+      if !debug then begin
+        Printf.printf "Schools: \n";
+        List.iter (fun school -> Printf.printf "%d " school) schools;
+        Printf.printf "\n\n";
+
+        Printf.printf "Students: \n";
+        List.iter (fun (student, wishes) -> Printf.printf "id: %d, wishes: " student; List.iter (fun wish -> Printf.printf "%d " wish) wishes; Printf.printf "\n") students;
+      end;
+
+      let _graph, hashtbl = create_graph_from_wishes students schools in
+      let clusters = get_clusters hashtbl in
+
+      if !debug then begin
+        Printf.printf "\nGraph created, here is nodes association:\n";
+        Hashtbl.iter (fun id node -> Printf.printf "Node %d: %s\n" id (match node with
+          | School(school) -> "School " ^ string_of_int school
+          | Student(student) -> "Student " ^ string_of_int student
+          | Source -> "Source"
+          | Sink -> "Sink"
+        )) hashtbl;
+
+        Printf.printf "\nClusters:\n";
+        List.iter (fun cluster -> List.iter (fun id -> Printf.printf "%d " id) cluster; Printf.printf "\n") clusters;
+      end;
+
+      (* let flow, graph = ford_fulkerson graph sts_source sts_sink step in
+
+      () *)
 
 
+    end;
+
+(* 
   (* Arguments are : infile(1) source-id(2) sink-id(3) outfile(4) *)
   
   let _infile = Sys.argv.(1)
@@ -37,7 +134,7 @@ let () =
   
   Printf.printf "Reading file...\n%!";
 
-  let students, schools = from_file_wishes "./wishes/wish_4.txt" in
+  let students, schools = from_file_wishes "./wishes/wish_0.txt" in
 
   (* print schools *)
   (* List.iter (fun school -> Printf.printf "School %d\n" school) schools; *)
@@ -76,13 +173,13 @@ let () =
 
   (* Compute students to schools *)
 
-  let _students_schools = students_to_schools students schools in
+  let students_schools = students_to_schools students schools in
 
   (* Print *)
-  (* List.iter (fun (student, school) -> Printf.printf "Student %d -> School %s\n" student (match school with
+  List.iter (fun (student, school) -> Printf.printf "Student %d -> School %s\n" student (match school with
     | Some school -> string_of_int school
     | None -> "None"
-  )) students_schools; *)
+  )) students_schools;
 
   (* let () = write_file outfile graph in *)
 
@@ -93,6 +190,6 @@ let () =
   let sgraph = gmap graph string_of_int in
 
   (* Rewrite the graph that has been read. *)
-  let () = export_with_clusters outfile sgraph clusters in
+  let () = export_with_clusters outfile sgraph clusters in *)
 
   ()

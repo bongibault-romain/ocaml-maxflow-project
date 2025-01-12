@@ -16,19 +16,23 @@ let add_arc g id1 id2 n = match (find_arc g id1 id2) with
 ;;
 
 exception Path_not_found
-  
-let find_path graph id1 id2 = 
-  let rec find_path_acc graph id1 id2 marked =
-    (* todo: marked node do not persists when a tested path fail *)
-    let rec loop arcs = match arcs with
+(* find a path using parcours en largeur *)
+let find_path graph source target = 
+  let rec aux queue visited = 
+    match queue with
     | [] -> raise Path_not_found
-    | arc::_ when arc.tgt = id2 -> [arc]
-    | arc::t when List.mem arc.tgt marked -> loop t;
-    | arc::t -> try arc::(find_path_acc graph (arc.tgt) id2 ((arc.src)::marked)) 
-                with Path_not_found -> (loop t)
-    in loop (out_arcs graph id1)
-  in find_path_acc graph id1 id2 [id1]
-;;
+    | (id, path)::queue -> 
+      if id = target then List.rev path
+      else if List.mem id visited then aux queue visited
+      else 
+        let new_visited = id::visited in
+        let out_arcs = List.filter (fun a -> a.lbl > 0) (out_arcs graph id) in
+        let new_queue = List.fold_left (fun acc arc -> (arc.tgt, arc::path)::acc) queue out_arcs in
+        (* let new_queue = e_fold graph (fun acc arc -> if arc.src = id then (arc.tgt, arc::path)::acc else acc) queue in *)
+        aux new_queue new_visited
+  in
+  aux [(source, [])] []
+
 
 let exists_path graph id1 id2 = 
   try ignore (find_path graph id1 id2); true 
@@ -41,7 +45,10 @@ let remove_negative_or_null_capacity graph =
   e_fold graph (fun g arc -> if arc.lbl <= 0 then g else new_arc g arc) (clone_nodes graph)
 
 let apply_capacity graph path capacity = 
-  let create_arcs g arc = add_arc (new_arc g { src = arc.src; tgt = arc.tgt; lbl = arc.lbl - capacity }) arc.tgt arc.src capacity in
+  let create_arcs g arc = 
+    let g = add_arc g arc.tgt arc.src capacity in
+    let g = new_arc g { src = arc.src; tgt = arc.tgt; lbl = arc.lbl - capacity } in
+    g in
   List.fold_left create_arcs graph path
 
 let rec print_path arcs = match arcs with
@@ -51,6 +58,20 @@ let rec print_path arcs = match arcs with
     print_path t;
 ;;
 
+let convert_to_flow_graph original graph = 
+  let g = clone_nodes graph in
+  e_fold original (fun g max_value -> 
+    let flow_value = (find_arc graph max_value.tgt max_value.src) in
+
+    let current_value = match flow_value with
+      | None -> 0
+      | Some arc -> arc.lbl in
+
+    let arc = { src = max_value.src; tgt = max_value.tgt; lbl = (string_of_int current_value) ^ "/" ^ (string_of_int (max_value.lbl)) } in
+
+    let g = new_arc g arc in
+    g
+  ) (gmap g string_of_int)
 
 (* Biparti matching, students and schools *)
 
@@ -64,8 +85,8 @@ type wish = student * school list
 
 type node = School of school | Student of student | Source | Sink
 
-let source = -1
-let sink = -2
+let sts_source = 0
+let sts_sink = 1
 
 (* let get_school = function
   | School(school) -> school
@@ -96,10 +117,10 @@ let create_schools_nodes graph hashtbl schools =
   )) (graph, []) schools
 
 let create_students_to_source_arcs graph wish_node_ids =
-  List.fold_left (fun g (id, _) -> new_arc g { src = -1; tgt = id; lbl = 1 }) graph wish_node_ids
+  List.fold_left (fun g (id, _) -> new_arc g { src = sts_source; tgt = id; lbl = 1 }) graph wish_node_ids
 
 let create_schools_to_sink_arcs graph school_nodes =
-  List.fold_left (fun g (id, _) -> new_arc g { src = id; tgt = -2; lbl = 1 }) graph school_nodes
+  List.fold_left (fun g (id, _) -> new_arc g { src = id; tgt = sts_sink; lbl = 1 }) graph school_nodes
 
 let create_students_to_schools_arcs (graph: 'a graph) wish_node_ids = 
   List.fold_left (fun g (student_node_id, (_, schools_node_ids)) -> 
@@ -113,11 +134,11 @@ let create_graph_from_wishes (wishes: wish list) (schools: school list) =
 
   let graph = empty_graph in
 
-  let graph = new_node graph source in
-  Hashtbl.add hashtbl source Source;
+  let graph = new_node graph sts_source in
+  Hashtbl.add hashtbl sts_source Source;
 
-  let graph = new_node graph sink in
-  Hashtbl.add hashtbl sink Sink;
+  let graph = new_node graph sts_sink in
+  Hashtbl.add hashtbl sts_sink Sink;
 
   (* Create the node of schools *)  
   let graph, school_node_ids = create_schools_nodes graph hashtbl schools in
@@ -142,3 +163,5 @@ let get_clusters hashtbl =
   [source;students;schools;sink]
 
 let in_arcs graph id = e_fold graph (fun acc arc -> if arc.tgt = id then arc::acc else acc) []
+
+let print_if b s = if b then Printf.printf "%s\n" s;;

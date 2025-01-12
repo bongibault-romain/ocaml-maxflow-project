@@ -10,10 +10,10 @@ exception Path_not_found
 
 (* Find a path in graph from id1 to id2 
 * @raise Path_not_found if no path found *)
-val find_path: 'a graph -> id -> id -> 'a path
+val find_path: id graph -> id -> id -> id path
   
 (* Check if a path exists in graph from id1 to id2 *)
-val exists_path: 'a graph -> id -> id -> bool
+val exists_path: id graph -> id -> id -> bool
 
 (* Find the minimum capacity of a path *)
 val find_minimum_path_capacity: id path -> id
@@ -38,8 +38,8 @@ type wish = student * school list
 
 type node = School of school | Student of student | Source | Sink
 
-val sink: int
-val source: int
+val sts_sink: int
+val sts_source: int
 
 (* Biparti matching, students and schools *)
 
@@ -48,3 +48,7 @@ val in_arcs: 'a graph -> id -> 'a arc list
 val create_graph_from_wishes: wish list -> school list -> (id graph * (id, node) Hashtbl.t)
 
 val get_clusters: (id, node) Hashtbl.t -> id list list
+
+val print_if: bool -> string -> unit
+
+val convert_to_flow_graph: id graph -> id graph -> string graph

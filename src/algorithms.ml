@@ -1,25 +1,22 @@
 open Tools
 open Graph
+open Gfile
 
-let ford_fulkerson graph source sink step =
-  step graph 0;
+let ford_fulkerson graph source sink step = step graph 0;
   let rec ford_fulkerson_counter graph flow i =
     try 
-      Printf.printf "FF: Finding path...\n%!";
       let path = find_path graph source sink in
-      Printf.printf "FF: Path found\n%!";
+
       let capacity = find_minimum_path_capacity path in
-      Printf.printf "FF: Capacity found: %d\n%!" capacity;
+
       let graph = apply_capacity graph path capacity in
-      Printf.printf "FF: Capacity applied\n%!";
-      let graph = remove_negative_or_null_capacity graph in
-      Printf.printf "FF: Capacity removed\n%!";
+
       let flow = flow + capacity in
 
       step graph i;
       ford_fulkerson_counter graph flow (i + 1)
     with
-      | Path_not_found -> flow, graph
+      | Path_not_found -> flow, remove_negative_or_null_capacity graph
 
   in ford_fulkerson_counter graph 0 1
 
@@ -33,8 +30,13 @@ let students_to_schools wishes schools =
 
   Printf.printf "Running Ford Fulkerson...\n%!";
 
-  let _, graph = ford_fulkerson graph source sink (fun _ i -> (
+  let clusters = get_clusters hashtbl in
+
+  let _, graph = ford_fulkerson graph sts_source sts_sink (fun g i -> (
     Printf.printf "Step %d\n%!" i;
+    let sgraph = gmap g string_of_int in
+    let filename = "example/graph" ^ (string_of_int i) ^ ".dot" in
+    export_with_clusters filename sgraph clusters;
   )) in
 
 
