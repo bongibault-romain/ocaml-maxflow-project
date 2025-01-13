@@ -13,7 +13,7 @@ let debug = ref false
 let biparti = ref false
 
 let usage = 
-  "\n✻ Usage: %s [OPTIONS]... [INFILE] -o [OUTFILE]" ^ Sys.argv.(0)
+  "\n✻ Usage: " ^ Sys.argv.(0) ^ " [OPTIONS]... [INFILE] -o [OUTFILE]"
   ^ ("\n\n🟄  INFILE   : input file containing a graph\n\n")
   ^ ("🟄  OPTIONS:\n")
 ;;
