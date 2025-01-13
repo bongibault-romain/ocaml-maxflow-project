@@ -9,15 +9,15 @@ val add_arc: int graph -> id -> id -> int -> int graph
 exception Path_not_found
 
 (* Find a path in graph from id1 to id2 
-* @raise Path_not_found if no path found *)
+ * @raise Path_not_found if no path found *)
 val find_path: id graph -> id -> id -> id path
-  
+
 (* Check if a path exists in graph from id1 to id2 *)
 val exists_path: id graph -> id -> id -> bool
 
 (* Find the minimum capacity of a path *)
 val find_minimum_path_capacity: id path -> id
-    
+
 (* Remove all arcs with negative or null capacity *)
 val remove_negative_or_null_capacity: id graph -> id graph
 

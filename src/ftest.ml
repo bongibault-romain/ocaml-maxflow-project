@@ -10,7 +10,6 @@ let infile = ref None
 let ford_fulkerson_source = ref None
 let ford_fulkerson_sink = ref None
 let debug = ref false
-
 let biparti = ref false
 
 let usage = 
@@ -34,32 +33,32 @@ let speclist = [
 
 let validate_args () =
   match !infile with
-    | None -> Printf.printf "Error: no input file specified\n"; exit 1
-    | Some _ -> ();
-  (* ensure not -f and -b at the same time *)
-  match (!ford_fulkerson_sink, !ford_fulkerson_source, !biparti) with
+  | None -> Printf.printf "Error: no input file specified\n"; exit 1
+  | Some _ -> ();
+    (* ensure not -f and -b at the same time *)
+    match (!ford_fulkerson_sink, !ford_fulkerson_source, !biparti) with
     | (Some _, Some _, true) -> Printf.printf "Error: -f and -b cannot be used at the same time\n"; exit 1
     | _ -> ();
-  (* -svg or -png needs -dot to be executed *)
-  match (!svg_outfile, !png_outfile, !outfile) with
-    | (Some _, _, None) 
-    | (_, Some _, None) -> Printf.printf "Error: -svg or -png options need -dot option to be executed\n"; exit 1
-    | _ -> ()
+      (* -svg or -png needs -dot to be executed *)
+      match (!svg_outfile, !png_outfile, !outfile) with
+      | (Some _, _, None) 
+      | (_, Some _, None) -> Printf.printf "Error: -svg or -png options need -dot option to be executed\n"; exit 1
+      | _ -> ()
 
 let () =
-    Arg.parse speclist anonymous usage;
+  Arg.parse speclist anonymous usage;
 
-    validate_args ();
+  validate_args ();
 
-    match (!ford_fulkerson_sink, !ford_fulkerson_source) with
-    | (Some sink, Some source) -> 
-        print_if !debug ("Reading input file (" ^ (Option.get (!infile)) ^ ")...\n");
-    
-        let sgraph = from_file (Option.get !infile) in
-        let graph = gmap sgraph int_of_string in
+  match (!ford_fulkerson_sink, !ford_fulkerson_source) with
+  | (Some sink, Some source) -> 
+    print_if !debug ("Reading input file (" ^ (Option.get (!infile)) ^ ")...\n");
 
-        print_if !debug ("Running Ford Fulkerson algorithm...");
-        let flow, end_graph = ford_fulkerson graph source sink (fun current_graph i -> (
+    let sgraph = from_file (Option.get !infile) in
+    let graph = gmap sgraph int_of_string in
+
+    print_if !debug ("Running Ford Fulkerson algorithm...");
+    let flow, end_graph = ford_fulkerson graph source sink (fun current_graph i -> (
           print_if !debug ("\nRunning Ford Fulkerson algorithm (step " ^ (string_of_int i) ^ ")...");
 
           if (Option.is_some !verbose) then begin
@@ -79,29 +78,29 @@ let () =
           end;
 
         )) in
-        let end_graph = convert_to_flow_graph graph end_graph in
+    let end_graph = convert_to_flow_graph graph end_graph in
 
-        (* Beautiful print result *)
-        Printf.printf "\n✻ Max flow: %d\n" flow;
+    (* Beautiful print result *)
+    Printf.printf "\n✻ Max flow: %d\n" flow;
 
-        if (Option.is_some !outfile) then begin
-          Printf.printf "✻ Graph exported at %s\n" (Option.get !outfile);
-          export (Option.get !outfile) end_graph;
+    if (Option.is_some !outfile) then begin
+      Printf.printf "✻ Graph exported at %s\n" (Option.get !outfile);
+      export (Option.get !outfile) end_graph;
 
-          if (Option.is_some !svg_outfile) then begin
-            Printf.printf "✻ Graph exported at %s\n" (Option.get !svg_outfile);
-            from_dot_to_svg (Option.get !outfile) (Option.get !svg_outfile);
-          end;
+      if (Option.is_some !svg_outfile) then begin
+        Printf.printf "✻ Graph exported at %s\n" (Option.get !svg_outfile);
+        from_dot_to_svg (Option.get !outfile) (Option.get !svg_outfile);
+      end;
 
-          if (Option.is_some !png_outfile) then begin
-            Printf.printf "✻ Graph exported at %s\n" (Option.get !png_outfile);
-            from_dot_to_png (Option.get !outfile) (Option.get !png_outfile);
-          end;
-        end;
+      if (Option.is_some !png_outfile) then begin
+        Printf.printf "✻ Graph exported at %s\n" (Option.get !png_outfile);
+        from_dot_to_png (Option.get !outfile) (Option.get !png_outfile);
+      end;
+    end;
 
-        Printf.printf "\n";
+    Printf.printf "\n";
 
-      | _ -> ();
+  | _ -> ();
 
     if !biparti then begin
       print_if !debug ("Running students-to-school assignation algorithm...");
@@ -125,11 +124,11 @@ let () =
       if !debug then begin
         Printf.printf "\nGraph created, here is nodes association:\n";
         Hashtbl.iter (fun id node -> Printf.printf "Node %d: %s\n" id (match node with
-          | School(school) -> "School " ^ string_of_int school
-          | Student(student) -> "Student " ^ string_of_int student
-          | Source -> "Source"
-          | Sink -> "Sink"
-        )) hashtbl;
+            | School(school) -> "School " ^ string_of_int school
+            | Student(student) -> "Student " ^ string_of_int student
+            | Source -> "Source"
+            | Sink -> "Sink"
+          )) hashtbl;
 
         Printf.printf "\nClusters:\n";
         List.iter (fun cluster -> List.iter (fun id -> Printf.printf "%d " id) cluster; Printf.printf "\n") clusters;
@@ -137,17 +136,17 @@ let () =
 
       (* let flow, graph = ford_fulkerson graph sts_source sts_sink step in
 
-      () *)
+         () *)
 
 
     end;
 
-(* 
+    (* 
   (* Arguments are : infile(1) source-id(2) sink-id(3) outfile(4) *)
-  
+
   let _infile = Sys.argv.(1)
   and outfile = Sys.argv.(4)
-  
+
   (* These command-line arguments are not used for the moment. *)
   and _source = int_of_string Sys.argv.(2)
   and _sink = int_of_string Sys.argv.(3)
@@ -160,7 +159,7 @@ let () =
 
   (* let schools = [0;1;2;3;4;5;6;7;8;9;10] in *)
   (* let students = [(0, [0;7;4]);(1,[0;2;4]);(2,[4;6;5;9]);(3,[0;5;3;4]);(4,[1;3;5;6]);(5,[2;0]);(6,[1;2;3;4;5]);(7,[1;8;9;3]);(8,[9;10;6;1;0]);(9,[1;0;5;10]);(10, [2;4;7;3])] in *)
-  
+
   Printf.printf "Reading file...\n%!";
 
   let students, schools = from_file_wishes "./wishes/wish_0.txt" in
@@ -221,4 +220,4 @@ let () =
   (* Rewrite the graph that has been read. *)
   let () = export_with_clusters outfile sgraph clusters in *)
 
-  ()
+    ()

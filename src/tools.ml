@@ -61,22 +61,22 @@ let rec print_path arcs = match arcs with
 let convert_to_flow_graph original graph = 
   let g = clone_nodes graph in
   e_fold original (fun g max_value -> 
-    let flow_value = (find_arc graph max_value.tgt max_value.src) in
+      let flow_value = (find_arc graph max_value.tgt max_value.src) in
 
-    let current_value = match flow_value with
-      | None -> 0
-      | Some arc -> arc.lbl in
+      let current_value = match flow_value with
+        | None -> 0
+        | Some arc -> arc.lbl in
 
-    let opposite_arc = find_arc original max_value.tgt max_value.src in
-    let opposite_max_value = match opposite_arc with
-      | None -> 0
-      | Some arc -> arc.lbl in
+      let opposite_arc = find_arc original max_value.tgt max_value.src in
+      let opposite_max_value = match opposite_arc with
+        | None -> 0
+        | Some arc -> arc.lbl in
 
-    let arc = { src = max_value.src; tgt = max_value.tgt; lbl = (string_of_int (max (current_value-opposite_max_value) 0)) ^ "/" ^ (string_of_int (max_value.lbl)) } in
+      let arc = { src = max_value.src; tgt = max_value.tgt; lbl = (string_of_int (max (current_value-opposite_max_value) 0)) ^ "/" ^ (string_of_int (max_value.lbl)) } in
 
-    let g = new_arc g arc in
-    g
-  ) (gmap g string_of_int)
+      let g = new_arc g arc in
+      g
+    ) (gmap g string_of_int)
 
 (* Biparti matching, students and schools *)
 
@@ -94,12 +94,12 @@ let sts_source = 0
 let sts_sink = 1
 
 (* let get_school = function
-  | School(school) -> school
-  | _ -> raise (Graph_error "Expected a school node")
+   | School(school) -> school
+   | _ -> raise (Graph_error "Expected a school node")
 
-let get_student = function
-  | Student(student) -> student
-  | _ -> raise (Graph_error "Expected a student node") *)
+   let get_student = function
+   | Student(student) -> student
+   | _ -> raise (Graph_error "Expected a student node") *)
 
 let rec find_school_node_id school_node_ids school = match school_node_ids with
   | [] -> failwith ("School not found " ^ string_of_int school)
@@ -109,17 +109,17 @@ let rec find_school_node_id school_node_ids school = match school_node_ids with
 (* Returns the graph and (id * wish) list *)
 let create_students_nodes graph hashtbl wishes school_node_ids =
   List.fold_left (fun (g, acc) (student, schools) -> (
-    let id, g = new_unique_node g in
-    Hashtbl.add hashtbl id (Student(student));
-    g, (id, (student, List.map (find_school_node_id school_node_ids) schools))::acc
-  )) (graph, []) wishes
+        let id, g = new_unique_node g in
+        Hashtbl.add hashtbl id (Student(student));
+        g, (id, (student, List.map (find_school_node_id school_node_ids) schools))::acc
+      )) (graph, []) wishes
 
 let create_schools_nodes graph hashtbl schools =
   List.fold_left (fun (g, acc) school -> (
-    let id, g = new_unique_node g in
-    Hashtbl.add hashtbl id (School(school));
-    g, (id, school)::acc
-  )) (graph, []) schools
+        let id, g = new_unique_node g in
+        Hashtbl.add hashtbl id (School(school));
+        g, (id, school)::acc
+      )) (graph, []) schools
 
 let create_students_to_source_arcs graph wish_node_ids =
   List.fold_left (fun g (id, _) -> new_arc g { src = sts_source; tgt = id; lbl = 1 }) graph wish_node_ids
@@ -129,10 +129,10 @@ let create_schools_to_sink_arcs graph school_nodes =
 
 let create_students_to_schools_arcs (graph: 'a graph) wish_node_ids = 
   List.fold_left (fun g (student_node_id, (_, schools_node_ids)) -> 
-    List.fold_left (fun g school_node_id -> 
-      new_arc g { src = student_node_id; tgt = school_node_id; lbl = 1 }
-    ) g schools_node_ids
-  ) graph wish_node_ids
+      List.fold_left (fun g school_node_id -> 
+          new_arc g { src = student_node_id; tgt = school_node_id; lbl = 1 }
+        ) g schools_node_ids
+    ) graph wish_node_ids
 
 let create_graph_from_wishes (wishes: wish list) (schools: school list) =
   let hashtbl = Hashtbl.create (List.length wishes) in
@@ -159,11 +159,11 @@ let create_graph_from_wishes (wishes: wish list) (schools: school list) =
 (* Returns id list list, the node are all in the hashtbl (Student, School, Sink or Source) *)
 let get_clusters hashtbl = 
   let source,students,schools,sink = Hashtbl.fold (fun id node (source, students, schools, sink) -> match node with
-    | Source -> id::source, students, schools, sink
-    | Student(_) -> source, id::students, schools, sink
-    | School(_) -> source, students, id::schools, sink
-    | Sink -> source, students, schools, id::sink
-  ) hashtbl ([],[],[],[]) in
+      | Source -> id::source, students, schools, sink
+      | Student(_) -> source, id::students, schools, sink
+      | School(_) -> source, students, id::schools, sink
+      | Sink -> source, students, schools, id::sink
+    ) hashtbl ([],[],[],[]) in
 
   [source;students;schools;sink]
 
