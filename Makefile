@@ -19,7 +19,7 @@ edit:
 
 demo: build
 	@echo "\n   ⚡  EXECUTING  ⚡\n"
-	./ftest.exe graphs/${graph} -f $(src) $(dst) -o outfile
+	./ftest.exe graphs/${graph} -f $(src) $(dst) -dot outfile
 	@echo "\n   🥁  RESULT (content of outfile)  🥁\n"
 	# @cat outfile
 
