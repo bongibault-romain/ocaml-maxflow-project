@@ -4,6 +4,8 @@ open Algorithms
 
 let verbose = ref None
 let outfile = ref None
+let svg_outfile = ref None
+let png_outfile = ref None
 let infile = ref None
 let ford_fulkerson_source = ref None
 let ford_fulkerson_sink = ref None
@@ -21,8 +23,10 @@ let anonymous filename =
   infile := Some filename
 
 let speclist = [
-  ("-v", Arg.String (fun s -> verbose := Some s), "[DIRECTORY]\n    Verbose mode, export all steps of the algorithm in DIRECTORY\n");
-  ("-o", Arg.String (fun s -> outfile := Some s), "[OUTFILE]\n    Output file in which the result should be written.\n");
+  ("-v", Arg.String (fun s -> verbose := Some (remove_trailing_slash s)), "[DIRECTORY]\n    Verbose mode, export all steps of the algorithm in DIRECTORY\n");
+  ("-dot", Arg.String (fun s -> outfile := Some (remove_trailing_slash s)), "[OUTFILE]\n    Output file in which the result should be written in DOT format.\n");
+  ("-svg", Arg.String (fun s -> svg_outfile := Some (remove_trailing_slash s)), "[OUTFILE]\n    Output file in which the result should be written in SVG format.\n");
+  ("-png", Arg.String (fun s -> png_outfile := Some (remove_trailing_slash s)), "[OUTFILE]\n    Output file in which the result should be written in PNG format.\n");
   ("-d", Arg.Unit (fun _ -> debug := true), "Debug mode, more information will be printed\n");
   ("-f", Arg.Tuple [Arg.Int (fun i -> ford_fulkerson_source := Some i); Arg.Int (fun i -> ford_fulkerson_sink := Some i)],  "[SOURCE] [SINK]\n    Launch ford fulkerson algorithm, SOURCE and SINK are the source and sink nodes.\n");
   ("-b", Arg.Unit (fun _ -> biparti := true), "Launch students-to-school assignation algorithm");
@@ -35,6 +39,11 @@ let validate_args () =
   (* ensure not -f and -b at the same time *)
   match (!ford_fulkerson_sink, !ford_fulkerson_source, !biparti) with
     | (Some _, Some _, true) -> Printf.printf "Error: -f and -b cannot be used at the same time\n"; exit 1
+    | _ -> ();
+  (* -svg or -png needs -dot to be executed *)
+  match (!svg_outfile, !png_outfile, !outfile) with
+    | (Some _, _, None) 
+    | (_, Some _, None) -> Printf.printf "Error: -svg or -png options need -dot option to be executed\n"; exit 1
     | _ -> ()
 
 let () =
@@ -57,6 +66,16 @@ let () =
             print_if !debug ("✻ Intermediate graph exported at step " ^ (Option.get !verbose) ^ "/" ^  string_of_int i ^ ".dot\n");
             let end_graph = convert_to_flow_graph graph current_graph in
             export ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".dot") end_graph;
+
+            if (Option.is_some !svg_outfile) then begin
+              print_if !debug ("✻ Intermediate graph exported at step " ^ (Option.get !verbose) ^ "/" ^  string_of_int i ^ ".svg\n");
+              from_dot_to_svg ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".dot") ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".svg");
+            end;
+
+            if (Option.is_some !png_outfile) then begin
+              print_if !debug ("✻ Intermediate graph exported at step " ^ (Option.get !verbose) ^ "/" ^  string_of_int i ^ ".png\n");
+              from_dot_to_png ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".dot") ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".png");
+            end;
           end;
 
         )) in
@@ -68,6 +87,16 @@ let () =
         if (Option.is_some !outfile) then begin
           Printf.printf "✻ Graph exported at %s\n" (Option.get !outfile);
           export (Option.get !outfile) end_graph;
+
+          if (Option.is_some !svg_outfile) then begin
+            Printf.printf "✻ Graph exported at %s\n" (Option.get !svg_outfile);
+            from_dot_to_svg (Option.get !outfile) (Option.get !svg_outfile);
+          end;
+
+          if (Option.is_some !png_outfile) then begin
+            Printf.printf "✻ Graph exported at %s\n" (Option.get !png_outfile);
+            from_dot_to_png (Option.get !outfile) (Option.get !png_outfile);
+          end;
         end;
 
         Printf.printf "\n";

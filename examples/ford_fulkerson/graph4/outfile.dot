@@ -1,0 +1,16 @@
+digraph exported_graph {
+	fontname="Helvetica,Arial,sans-serif"
+	node [fontname="Helvetica,Arial,sans-serif"]
+	edge [fontname="Helvetica,Arial,sans-serif"]
+	rankdir = BT;
+	splines = false;
+	node [shape = circle];
+	4 -> 1 [label = "0/5"]
+	4 -> 5 [label = "7/10"]
+	2 -> 3 [label = "3/3"]
+	2 -> 5 [label = "7/7"]
+	3 -> 4 [label = "7/10"]
+	0 -> 3 [label = "4/4"]
+	0 -> 1 [label = "10/15"]
+	1 -> 2 [label = "10/12"]
+}

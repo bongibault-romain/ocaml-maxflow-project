@@ -23,3 +23,9 @@ val write_file: path -> string graph -> unit
 *)
 
 val from_file_wishes: path -> wish list * school list
+ 
+val from_dot_to_png: string -> string -> unit
+ 
+val from_dot_to_svg: string -> string -> unit
+
+val remove_trailing_slash: string -> string

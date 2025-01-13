@@ -52,7 +52,18 @@ let write_file path graph =
   close_out ff ;
   ()
 
+let create_missing_directories path =
+  let rec create_missing_directories_rec path =
+    if not (Sys.file_exists path) then
+      create_missing_directories_rec (Filename.dirname path);
+    if not (Sys.file_exists path) then
+      Sys.mkdir path 0o777
+  in
+  create_missing_directories_rec path
+
 let export path graph =
+  create_missing_directories (Filename.dirname path);
+
   (* Open a write-file *)
   let ff = open_out path in
 
@@ -67,6 +78,8 @@ let export path graph =
   ()
 
 let export_with_clusters path graph clusters =
+  create_missing_directories (Filename.dirname path);
+
   (* Open a write-file *)
   let ff = open_out path in
 
@@ -177,3 +190,15 @@ let from_file_wishes path =
 
   close_in infile;
   students, schools
+
+let from_dot_to_png infile outfile = 
+  let command = "dot -Tpng " ^ infile ^ " > " ^ outfile in
+  ignore (Sys.command command)
+
+let from_dot_to_svg infile outfile = 
+  let command = "dot -Tsvg " ^ infile ^ " > " ^ outfile in
+  ignore (Sys.command command)
+
+let remove_trailing_slash path = 
+  let len = String.length path in
+  if path.[len - 1] = '/' then String.sub path 0 (len - 1) else path

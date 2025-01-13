@@ -67,7 +67,12 @@ let convert_to_flow_graph original graph =
       | None -> 0
       | Some arc -> arc.lbl in
 
-    let arc = { src = max_value.src; tgt = max_value.tgt; lbl = (string_of_int current_value) ^ "/" ^ (string_of_int (max_value.lbl)) } in
+    let opposite_arc = find_arc original max_value.tgt max_value.src in
+    let opposite_max_value = match opposite_arc with
+      | None -> 0
+      | Some arc -> arc.lbl in
+
+    let arc = { src = max_value.src; tgt = max_value.tgt; lbl = (string_of_int (max (current_value-opposite_max_value) 0)) ^ "/" ^ (string_of_int (max_value.lbl)) } in
 
     let g = new_arc g arc in
     g
