@@ -1,0 +1,75 @@
+digraph exported_graph {
+	fontname="Helvetica,Arial,sans-serif"
+	node [fontname="Helvetica,Arial,sans-serif"]
+	edge [fontname="Helvetica,Arial,sans-serif"];
+	rankdir = BT;
+	splines = false;
+	node [shape = circle];
+	6 -> 1 [label = "0/2"]
+	5 -> 1 [label = "0/1"]
+	4 -> 1 [label = "1/2"]
+	3 -> 1 [label = "1/1"]
+	2 -> 1 [label = "0/2"]
+	0 -> 16 [label = "1/1"]
+	0 -> 15 [label = "1/1"]
+	0 -> 14 [label = "0/1"]
+	0 -> 13 [label = "0/1"]
+	0 -> 12 [label = "0/1"]
+	0 -> 11 [label = "0/1"]
+	0 -> 10 [label = "0/1"]
+	0 -> 9 [label = "0/1"]
+	0 -> 8 [label = "0/1"]
+	0 -> 7 [label = "0/1"]
+	16 -> 4 [label = "1/1"]
+	16 -> 2 [label = "0/1"]
+	16 -> 5 [label = "0/1"]
+	15 -> 3 [label = "1/1"]
+	15 -> 6 [label = "0/1"]
+	14 -> 3 [label = "0/1"]
+	14 -> 2 [label = "0/1"]
+	14 -> 4 [label = "0/1"]
+	13 -> 4 [label = "0/1"]
+	13 -> 3 [label = "0/1"]
+	13 -> 2 [label = "0/1"]
+	12 -> 4 [label = "0/1"]
+	12 -> 5 [label = "0/1"]
+	12 -> 6 [label = "0/1"]
+	12 -> 2 [label = "0/1"]
+	11 -> 4 [label = "0/1"]
+	11 -> 2 [label = "0/1"]
+	11 -> 5 [label = "0/1"]
+	10 -> 6 [label = "0/1"]
+	10 -> 3 [label = "0/1"]
+	10 -> 4 [label = "0/1"]
+	9 -> 3 [label = "0/1"]
+	9 -> 2 [label = "0/1"]
+	9 -> 5 [label = "0/1"]
+	8 -> 4 [label = "0/1"]
+	8 -> 3 [label = "0/1"]
+	8 -> 6 [label = "0/1"]
+	7 -> 4 [label = "0/1"]
+	7 -> 5 [label = "0/1"]
+	7 -> 2 [label = "0/1"]
+	7 -> 3 [label = "0/1"]
+	7 -> 6 [label = "0/1"]
+	subgraph {
+		rank = same;
+		color = transparent;
+		0; 
+	}
+	subgraph {
+		rank = same;
+		color = transparent;
+		15; 10; 11; 9; 12; 13; 7; 8; 16; 14; 
+	}
+	subgraph {
+		rank = same;
+		color = transparent;
+		4; 5; 3; 2; 6; 
+	}
+	subgraph {
+		rank = same;
+		color = transparent;
+		1; 
+	}
+}
