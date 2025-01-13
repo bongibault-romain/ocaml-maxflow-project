@@ -162,9 +162,14 @@ let from_file path =
   close_in infile ;
   final_graph
 
+let rec read_schools_by_two list = match list with
+  | [] -> []
+  | a::b::tl -> (a, b)::(read_schools_by_two tl)
+  | _ -> failwith "read_schools_by_two: odd number of schools"
+
 let read_schools line =
   let schools = String.split_on_char ' ' line in
-  List.map int_of_string schools
+  read_schools_by_two (List.map int_of_string schools)
 
 let read_wishes line =
   let wishes = String.split_on_char ' ' line in

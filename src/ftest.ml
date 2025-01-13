@@ -83,7 +83,7 @@ let () =
 
       if !debug then begin
         Printf.printf "Schools: \n";
-        List.iter (fun school -> Printf.printf "%d " school) schools;
+        List.iter (fun (school, places) -> Printf.printf "id: %d places: %d\n" school places) schools;
         Printf.printf "\n\n";
 
         Printf.printf "Students: \n";

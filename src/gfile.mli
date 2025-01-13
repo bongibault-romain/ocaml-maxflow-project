@@ -22,7 +22,7 @@ val write_file: path -> string graph -> unit
    https://algorithms.discrete.ma.tum.de/graph-algorithms/flow-ford-fulkerson/index_en.html
 *)
 
-val from_file_wishes: path -> wish list * school list
+val from_file_wishes: path -> wish list * (school * int) list
 
 val from_dot_to_png: string -> string -> unit
 

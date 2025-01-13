@@ -45,7 +45,7 @@ val sts_source: int
 
 val in_arcs: 'a graph -> id -> 'a arc list
 
-val create_graph_from_wishes: wish list -> school list -> (id graph * (id, node) Hashtbl.t)
+val create_graph_from_wishes: wish list -> (school * int) list -> (id graph * (id, node) Hashtbl.t)
 
 val get_clusters: (id, node) Hashtbl.t -> id list list
 

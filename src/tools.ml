@@ -103,7 +103,7 @@ let sts_sink = 1
 
 let rec find_school_node_id school_node_ids school = match school_node_ids with
   | [] -> failwith ("School not found " ^ string_of_int school)
-  | (id, s)::_ when school = s -> id
+  | (id, s, _)::_ when school = s -> id
   | _::t -> find_school_node_id t school
 
 (* Returns the graph and (id * wish) list *)
@@ -115,17 +115,17 @@ let create_students_nodes graph hashtbl wishes school_node_ids =
       )) (graph, []) wishes
 
 let create_schools_nodes graph hashtbl schools =
-  List.fold_left (fun (g, acc) school -> (
+  List.fold_left (fun (g, acc) (school, capacity) -> (
         let id, g = new_unique_node g in
         Hashtbl.add hashtbl id (School(school));
-        g, (id, school)::acc
+        g, (id, school, capacity)::acc
       )) (graph, []) schools
 
 let create_students_to_source_arcs graph wish_node_ids =
   List.fold_left (fun g (id, _) -> new_arc g { src = sts_source; tgt = id; lbl = 1 }) graph wish_node_ids
 
 let create_schools_to_sink_arcs graph school_nodes =
-  List.fold_left (fun g (id, _) -> new_arc g { src = id; tgt = sts_sink; lbl = 1 }) graph school_nodes
+  List.fold_left (fun g (id, _, capacity) -> new_arc g { src = id; tgt = sts_sink; lbl = capacity }) graph school_nodes
 
 let create_students_to_schools_arcs (graph: 'a graph) wish_node_ids = 
   List.fold_left (fun g (student_node_id, (_, schools_node_ids)) -> 
@@ -134,7 +134,7 @@ let create_students_to_schools_arcs (graph: 'a graph) wish_node_ids =
         ) g schools_node_ids
     ) graph wish_node_ids
 
-let create_graph_from_wishes (wishes: wish list) (schools: school list) =
+let create_graph_from_wishes (wishes: wish list) (schools: (school * int) list) =
   let hashtbl = Hashtbl.create (List.length wishes) in
 
   let graph = empty_graph in
