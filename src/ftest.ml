@@ -90,27 +90,32 @@ let () =
         List.iter (fun (student, wishes) -> Printf.printf "id: %d, wishes: " student; List.iter (fun wish -> Printf.printf "%d " wish) wishes; Printf.printf "\n") students;
       end;
 
-      let _graph, hashtbl = create_graph_from_wishes students schools in
-      let clusters = get_clusters hashtbl in
-
-      if !debug then begin
-        Printf.printf "\nGraph created, here is nodes association:\n";
-        Hashtbl.iter (fun id node -> Printf.printf "Node %d: %s\n" id (match node with
-            | School(school) -> "School " ^ string_of_int school
-            | Student(student) -> "Student " ^ string_of_int student
-            | Source -> "Source"
-            | Sink -> "Sink"
-          )) hashtbl;
-
-        Printf.printf "\nClusters:\n";
-        List.iter (fun cluster -> List.iter (fun id -> Printf.printf "%d " id) cluster; Printf.printf "\n") clusters;
+      let assignations, original, bgraph, clusters = students_to_schools students schools in
+      let end_graph = convert_to_flow_graph original bgraph in
+      
+      if (Option.is_some !outfile) then begin
+        Printf.printf "✻ Graph exported at %s\n" (Option.get !outfile);
+        export_with_clusters (Option.get !outfile) end_graph clusters;
+  
+        if (Option.is_some !svg_outfile) then begin
+          Printf.printf "✻ Graph exported at %s\n" (Option.get !svg_outfile);
+          from_dot_to_svg (Option.get !outfile) (Option.get !svg_outfile);
+        end;
+  
+        if (Option.is_some !png_outfile) then begin
+          Printf.printf "✻ Graph exported at %s\n" (Option.get !png_outfile);
+          from_dot_to_png (Option.get !outfile) (Option.get !png_outfile);
+        end;
       end;
 
-      (* let flow, graph = ford_fulkerson graph sts_source sts_sink step in
+      Printf.printf "\n";
 
-         () *)
+      (* Show assignations *)
+      List.iter (fun (student, school) -> (match school with
+      | Some s -> Printf.printf "✻ Student %d goes to school %d\n" student s
+      | _ -> Printf.printf "✻ Student %d has no assignation\n" student)) assignations;
 
-
+      ()
     end;
 
     (* 
