@@ -92,16 +92,16 @@ let () =
 
       let assignations, original, bgraph, clusters = students_to_schools students schools in
       let end_graph = convert_to_flow_graph original bgraph in
-      
+
       if (Option.is_some !outfile) then begin
         Printf.printf "✻ Graph exported at %s\n" (Option.get !outfile);
         export_with_clusters (Option.get !outfile) end_graph clusters;
-  
+
         if (Option.is_some !svg_outfile) then begin
           Printf.printf "✻ Graph exported at %s\n" (Option.get !svg_outfile);
           from_dot_to_svg (Option.get !outfile) (Option.get !svg_outfile);
         end;
-  
+
         if (Option.is_some !png_outfile) then begin
           Printf.printf "✻ Graph exported at %s\n" (Option.get !png_outfile);
           from_dot_to_png (Option.get !outfile) (Option.get !png_outfile);
@@ -112,6 +112,6 @@ let () =
 
       (* Show assignations *)
       List.iter (fun (student, school) -> (match school with
-      | Some s -> Printf.printf "✻ Student %d goes to school %d\n" student s
-      | _ -> Printf.printf "✻ Student %d has no assignation\n" student)) assignations;
+          | Some s -> Printf.printf "✻ Student %d goes to school %d\n" student s
+          | _ -> Printf.printf "✻ Student %d has no assignation\n" student)) assignations;
     end;

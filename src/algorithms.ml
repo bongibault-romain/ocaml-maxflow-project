@@ -48,25 +48,25 @@ let students_to_schools wishes schools =
   if !debug then Printf.printf "Computing students to schools (applying ford fulkerson)...\n%!";
 
   let _, egraph = ford_fulkerson graph sts_source sts_sink (fun current_graph i -> (
-    print_if !debug ("\nRunning Ford Fulkerson algorithm (step " ^ (string_of_int i) ^ ")...");
+        print_if !debug ("\nRunning Ford Fulkerson algorithm (step " ^ (string_of_int i) ^ ")...");
 
-    if (Option.is_some !verbose) then begin
-      print_if !debug ("✻ Intermediate graph exported at step " ^ (Option.get !verbose) ^ "/" ^  string_of_int i ^ ".dot\n");
-      let end_graph = convert_to_flow_graph graph current_graph in
-      export_with_clusters ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".dot") end_graph clusters;
+        if (Option.is_some !verbose) then begin
+          print_if !debug ("✻ Intermediate graph exported at step " ^ (Option.get !verbose) ^ "/" ^  string_of_int i ^ ".dot\n");
+          let end_graph = convert_to_flow_graph graph current_graph in
+          export_with_clusters ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".dot") end_graph clusters;
 
-      if (Option.is_some !svg_outfile) then begin
-        print_if !debug ("✻ Intermediate graph exported at step " ^ (Option.get !verbose) ^ "/" ^  string_of_int i ^ ".svg\n");
-        from_dot_to_svg ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".dot") ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".svg");
-      end;
+          if (Option.is_some !svg_outfile) then begin
+            print_if !debug ("✻ Intermediate graph exported at step " ^ (Option.get !verbose) ^ "/" ^  string_of_int i ^ ".svg\n");
+            from_dot_to_svg ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".dot") ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".svg");
+          end;
 
-      if (Option.is_some !png_outfile) then begin
-        print_if !debug ("✻ Intermediate graph exported at step " ^ (Option.get !verbose) ^ "/" ^  string_of_int i ^ ".png\n");
-        from_dot_to_png ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".dot") ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".png");
-      end;
-    end;
+          if (Option.is_some !png_outfile) then begin
+            print_if !debug ("✻ Intermediate graph exported at step " ^ (Option.get !verbose) ^ "/" ^  string_of_int i ^ ".png\n");
+            from_dot_to_png ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".dot") ((Option.get (!verbose)) ^ "/" ^ string_of_int i ^ ".png");
+          end;
+        end;
 
-  )) in
+      )) in
 
   if !debug then Printf.printf "Computing students to schools...\n%!";
 
