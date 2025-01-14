@@ -8,7 +8,7 @@
 
 - [x] Création d'un CLI pour une utilisation plus simple du programme.
 
-- [] Implémentation de tests unitaires à l'aide de OUnit2
+- [ ] Implémentation de tests unitaires à l'aide de OUnit2
 
 # How to run
 
