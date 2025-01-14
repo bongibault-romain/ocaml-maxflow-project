@@ -16,7 +16,6 @@ let add_arc g id1 id2 n = match (find_arc g id1 id2) with
 ;;
 
 exception Path_not_found
-(* find a path using parcours en largeur *)
 let find_path graph source target = 
   let rec aux queue visited = 
     match queue with
@@ -28,11 +27,9 @@ let find_path graph source target =
         let new_visited = id::visited in
         let out_arcs = List.filter (fun a -> a.lbl > 0) (out_arcs graph id) in
         let new_queue = List.fold_left (fun acc arc -> (arc.tgt, arc::path)::acc) queue out_arcs in
-        (* let new_queue = e_fold graph (fun acc arc -> if arc.src = id then (arc.tgt, arc::path)::acc else acc) queue in *)
         aux new_queue new_visited
   in
   aux [(source, [])] []
-
 
 let exists_path graph id1 id2 = 
   try ignore (find_path graph id1 id2); true 
@@ -92,14 +89,6 @@ type node = School of school | Student of student | Source | Sink
 
 let sts_source = 0
 let sts_sink = 1
-
-(* let get_school = function
-   | School(school) -> school
-   | _ -> raise (Graph_error "Expected a school node")
-
-   let get_student = function
-   | Student(student) -> student
-   | _ -> raise (Graph_error "Expected a student node") *)
 
 let rec find_school_node_id school_node_ids school = match school_node_ids with
   | [] -> failwith ("School not found " ^ string_of_int school)
