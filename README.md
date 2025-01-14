@@ -1,14 +1,14 @@
 # Features
 
-[x] Implémentation de l'algorithme de Ford Fulkerson
+- [x] Implémentation de l'algorithme de Ford Fulkerson
 
-[x] Implémentation d'un algorithme de répartition des étudiants dans des écoles, les écoles ayant toutes une capacité maximale.
+- [x] Implémentation d'un algorithme de répartition des étudiants dans des écoles, les écoles ayant toutes une capacité maximale.
 
-[x] Exportation du graphe de flot final aux formats dot, png et svg.
+- [x] Exportation du graphe de flot final aux formats dot, png et svg.
 
-[x] Création d'un CLI pour une utilisation plus simple du programme.
+- [x] Création d'un CLI pour une utilisation plus simple du programme.
 
-[] Implémentation de tests unitaires à l'aide de OUnit2
+- [] Implémentation de tests unitaires à l'aide de OUnit2
 
 # How to run
 
